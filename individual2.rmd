@@ -1,0 +1,105 @@
+---
+title: "Individual 2"
+author: "Patrick Wenzel"
+date: "9/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE}
+choco <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/data/choco.csv") 
+str(choco)
+```
+
+## Searching for Best Chocolates
+
+1. How are the ratings distributed? Create both a histogram and a boxplot and describe them. Don’t forget to mention outliers, if there are any.
+
+    ```{r}
+      hist(choco$Rating)
+    ```
+    
+    What this historgram is showing is the distribution of ratings for chocolates. From what it looks like, the majority of rating are between ~2.6 - ~3.7. It looks like there could be some outliers at 1.0, 1.5, ~1.6, and ~1.8
+    
+    ```{r}
+      boxplot(choco$Rating)
+    ```
+    
+    This boxplot is showing that the lower quartile of the ratings is 3.0 and that the upper quartile is 3.5. We also know from this box plot that the median of this dataset is around 3.25. Confirming the outliers I suspected above, the boxplot shows outliers at 1.0, 1.5, ~1.6, and 1.9.
+    
+2. How does the number of ratings depend on the year? Draw a bar chart of the number of reports.
+
+    ```{r}
+      ratingsByYear <- aggregate(Rating ~ Date, data = choco, FUN = function(x){NROW(x)})
+      barplot(ratingsByYear$Rating, ratingsByYear$Date, xlab = 'Year of Ratings', ylab = 'Number of Ratings that Year', main = 'Number of Ratings per Year', names.arg = ratingsByYear$Date, cex.names = 0.7)
+    ```
+    
+    As you can see in this bar graph, typically, as the years get larger, the more reviews there are with the max being in 2015. There was a decline after 2015 and now there seem to be ~200 reviews/year.
+
+3. Do ratings depend on the cacao percentage of a chocolate bar? Create both numerical and graphical summaries, and explain.
+
+    ```{r}
+      ratingsByCacaoPerc <- aggregate(Rating ~ Cocoa_Percent, data = choco, mean)
+      ratingsByCacaoPerc
+      plot(ratingsByCacaoPerc$Cocoa_Percent, ratingsByCacaoPerc$Rating, xlab = 'Cocoa Percentage', ylab = 'Average Rating', main = 'Average Rating per Cocoa Percentage')
+      cor(ratingsByCacaoPerc$Cocoa_Percent, ratingsByCacaoPerc$Rating)
+    ```
+
+    From the numerical summeries, you can start to see that the average doesn't really seem to depend on the cocoa percentage of the chocolate bar. There's a good mix of bars with a lower cocoa percentage having a higher average rating and vice versa. From the scatter plot you can really see this. Even as the cocoa percentage increases, the average rating is usually between 2.5 and 3.5. Finally, below the scatterplot, the correlation efficient between cocoa percentage and average rating is -0.178, which means that there is a very weak correlation between the two.
+
+4. How do different characteristics of the chocolate compare? To elaborate, which characteristics tend to be more favorable and which ones are not? Create both numerical and graphical summaries, and explain.
+
+    ```{r}
+      ratingsByCharacteristic <- aggregate(Rating ~ Characteristics1, data = choco, mean)
+      ratingsByCharacteristicSorted <- ratingsByCharacteristic[order(ratingsByCharacteristic$Rating), ]
+      ratingsByCharacteristicSorted
+      barplot(ratingsByCharacteristicSorted$Rating, xlab = 'Primary Characteristic', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Primary Characteristic', las = 2, names.arg = ratingsByCharacteristicSorted$Characteristics1, cex.names = 0.4)
+    ```
+    
+    From the left, you can see that malitol, over roasted, charred, and leather are some of the least favorable primary characteristics. On the other hand, Sweet spice, distinct lemon, tropical fruit, and strong cocoa are the most favored primary characteristics. Looking at the numerical data above the chart, you get a better look into which primary characteristics are prefered/not preferred since the graph cannot display all of the names.
+    
+5. I would like to find out which countries produce the best bars and I would like to find out what company produces the best chocolate bars
+
+
+    ```{r}
+      ratingsByCountry <- aggregate(Rating ~ Location, data = choco, mean)
+      ratingsByCountry
+      barplot(ratingsByCountry$Rating, xlab = 'Country', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Country', las = 2, names.arg = ratingsByCountry$Location, cex.names = 0.4)
+    ```
+
+    Although hard to see, easier if you drag the image into a new tab, the average rating of chocolate bars per country is pretty consistent. There are a some dips like Ghana, Gernada, India, Ireland, Malaysia, Martinique, Portugal, Puerto Rico, Singapore, St. Lucia, St. Vincent-Grenadines, Vanuatu, and Wales. Other than these countries the average rating of countries is above 3.0 (~81% !).
+
+    ```{r}
+      ratingsByCompany <- aggregate(Rating ~ Company, data = choco, mean)
+      ratingsByCompany
+      barplot(ratingsByCompany$Rating, xlab = 'Company', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Company', las = 2, names.arg = ratingsByCompany$Company, cex.names = 0.4)
+      hist(ratingsByCompany$Rating)
+    ```
+
+    Although there a lot of companies and it is not easy to see individual companies in the barchart, it obvious that there is a wide range of ratings. The histogram also confirms this with spikes from ~2.5 - ~3.75.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
