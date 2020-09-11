@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-```{r}
+```{r, include = FALSE}
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
@@ -24,7 +24,19 @@ str(choco)
 ggplot(choco, aes(x=Rating)) + geom_histogram(binwidth=.25,color = "black", fill = "gray")+ labs(title="Histogram of Ratings of Choco Bins=.25") + geom_vline(aes(xintercept=median(Rating)), color="blue", linetype="dashed") +scale_x_continuous(breaks = scales::pretty_breaks(n = 12)) 
 
 ggplot(choco, aes(x="Rating", y=Rating))+geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4, color='blue') + labs(title="Ratings")
-
-
 ```
+
+    What this historgram is showing is the distribution of ratings for chocolates. From what it looks like, the majority of rating are between ~2.6 - ~3.7. It looks like there could be some outliers at 1.0, 1.5, ~1.6, and ~1.8. This boxplot is showing that the lower quartile of the ratings is 3.0 and that the upper quartile is 3.5. We also know from this box plot that the median of this dataset is around 3.25. Confirming the outliers I suspected above, the boxplot shows outliers at 1.0, 1.5, ~1.6, and 1.9. 
+
+2. How does the number of ratings depend on the year? Draw a bar chart of the number of reports.
+```{r}
+ratingsByYear <- aggregate(Rating ~ Date, data = choco, FUN = function(x){NROW(x)})
+      barplot(ratingsByYear$Rating, ratingsByYear$Date, xlab = 'Year of Ratings', ylab = 'Number of Ratings that Year', main = 'Number of Ratings per Year', names.arg = ratingsByYear$Date, cex.names = 0.7)
+```
+
+    As you can see in this bar graph, typically, as the years get larger, the more reviews there are with the max being in 2015. There was a decline after 2015 and now there seem to be ~200 reviews/year.
+
+3. 
+
+
 
