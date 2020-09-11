@@ -8,14 +8,65 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(devtools)
+
+choco <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/data/choco.csv") 
+str(choco) 
+```
+1. How are the ratings distributed? Create both a histogram and a boxplot and describe them. Don’t forget to mention outliers, if there are any.
+```{r}
+ggplot(choco, aes(x=Rating)) + geom_histogram(binwidth=.25,color = "black", fill = "gray")+ labs(title="Histogram of Ratings of Choco Bins=.25") + geom_vline(aes(xintercept=median(Rating)), color="blue", linetype="dashed") +scale_x_continuous(breaks = scales::pretty_breaks(n = 12)) 
+
+ggplot(choco, aes(x="Rating", y=Rating))+geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4, color='blue') + labs(title="Ratings")
 
 
-<!-- ## Including Plots -->
+```
 
-<!-- You can also embed plots, for example: -->
+2. How does the number of ratings depend on the year? Draw a bar chart of the number of reports.
+```{r}
+sortedData <- choco[order(choco$Date),]
+ratingsByYear <- aggregate(Rating ~ Date, data = sortedData, FUN = function(x){NROW(x)})
 
-<!-- ```{r pressure, echo=FALSE} -->
-<!-- plot(pressure) -->
-<!-- ``` -->
+ggplot(data=ratingsByYear, aes(x=Date, y=Rating)) +
+  geom_bar(stat="identity", fill="steelblue",)+
+  geom_text(aes(label=Rating), vjust=1.6, color="white", size=3.5)+
+  theme_minimal()+scale_x_continuous(breaks = scales::pretty_breaks(n = 10)) + labs(title="Number of Ratings by Year")
 
-<!-- Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot. -->
+
+```
+
+
+
+3. Do ratings depend on the cacao percentage of a chocolate bar? Create both numerical and graphical summaries, and explain.
+```{r}
+ratingsByCacaoPercent <- aggregate(Rating ~ Cocoa_Percent, data = choco, mean)
+
+ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent)) + geom_histogram(bins = 12, color = "black", fill = "gray")+ geom_vline(aes(xintercept=median(Cocoa_Percent)), color="blue", linetype="dashed") +scale_x_continuous(breaks = scales::pretty_breaks(n = 12)) 
+
+ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating))+geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4, color='blue') + labs(title="Ratings")
+
+ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)+
+  theme_classic()
+
+ratingsByCacaoPercent
+```
+
+
+4. How do different characteristics of the chocolate compare? To elaborate, which characteristics tend to be more favorable and which ones are not? Create both numerical and graphical summaries, and explain.
+```{r}
+
+```
+
+5. Brainstorm two analyses you would like to perform with your teammate. Describe in plain language what comparisons are you making. Create suitable numerical and graphical summaries for your analyses. Describe the results.
+```{r}
+
+```
+
+
+
