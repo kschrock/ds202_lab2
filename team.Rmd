@@ -9,22 +9,22 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(devtools)
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+choco <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/data/choco.csv") 
+str(choco) 
+```
+1. How are the ratings distributed? Create both a histogram and a boxplot and describe them. Don’t forget to mention outliers, if there are any.
+```{r}
+ggplot(choco, aes(x=Rating)) + geom_histogram(binwidth=.25,color = "black", fill = "gray")+ labs(title="Histogram of Ratings of Choco Bins=.25") + geom_vline(aes(xintercept=median(Rating)), color="blue", linetype="dashed") +scale_x_continuous(breaks = scales::pretty_breaks(n = 12)) 
 
-```{r cars}
-summary(cars)
+ggplot(choco, aes(x="Rating", y=Rating))+geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4, color='blue') + labs(title="Ratings")
+
+
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
