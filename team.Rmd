@@ -54,12 +54,41 @@ ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating)) +
   geom_point() + 
   geom_smooth(method=lm, se=FALSE, fullrange=TRUE)+
   theme_classic()
-
 ```
+
 4. How do different characteristics of the chocolate compare? To elaborate, which characteristics tend to be more favorable and which ones are not? Create both numerical and graphical summaries, and explain.
-```{r}
 
-```
+    ```{r}
+      ratingsByCharacteristic <- aggregate(Rating ~ Characteristics1, data = choco, mean)
+      ratingsByCharacteristicSorted <- ratingsByCharacteristic[order(ratingsByCharacteristic$Rating), ]
+      ratingsByCharacteristicSorted
+      barplot(ratingsByCharacteristicSorted$Rating, xlab = 'Primary Characteristic', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Primary Characteristic', las = 2, names.arg = ratingsByCharacteristicSorted$Characteristics1, cex.names = 0.4)
+    ```
+    
+    From the left, you can see that malitol, over roasted, charred, and leather are some of the least favorable primary characteristics. On the other hand, Sweet spice, distinct lemon, tropical fruit, and strong cocoa are the most favored primary characteristics. Looking at the numerical data above the chart, you get a better look into which primary characteristics are prefered/not preferred since the graph cannot display all of the names.
+
+5. I would like to find out which countries produce the best bars and I would like to find out what company produces the best chocolate bars
+
+
+    ```{r}
+      ratingsByCountry <- aggregate(Rating ~ Location, data = choco, mean)
+      ratingsByCountry
+      barplot(ratingsByCountry$Rating, xlab = 'Country', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Country', las = 2, names.arg = ratingsByCountry$Location, cex.names = 0.4)
+    ```
+
+    Although hard to see, easier if you drag the image into a new tab, the average rating of chocolate bars per country is pretty consistent. There are a some dips like Ghana, Gernada, India, Ireland, Malaysia, Martinique, Portugal, Puerto Rico, Singapore, St. Lucia, St. Vincent-Grenadines, Vanuatu, and Wales. Other than these countries the average rating of countries is above 3.0 (~81% !).
+
+    ```{r}
+      ratingsByCompany <- aggregate(Rating ~ Company, data = choco, mean)
+      ratingsByCompany
+      barplot(ratingsByCompany$Rating, xlab = 'Company', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Company', las = 2, names.arg = ratingsByCompany$Company, cex.names = 0.4)
+      hist(ratingsByCompany$Rating)
+    ```
+
+    Although there a lot of companies and it is not easy to see individual companies in the barchart, it obvious that there is a wide range of ratings. The histogram also confirms this with spikes from ~2.5 - ~3.75.
+
+
+
 
 
 
