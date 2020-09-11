@@ -37,6 +37,29 @@ ratingsByYear <- aggregate(Rating ~ Date, data = choco, FUN = function(x){NROW(x
     As you can see in this bar graph, typically, as the years get larger, the more reviews there are with the max being in 2015. There was a decline after 2015 and now there seem to be ~200 reviews/year.
 
 3. 
+```{r}
+ ratingsByCacaoPerc <- aggregate(Rating ~ Cocoa_Percent, data = choco, mean)
+      ratingsByCacaoPerc
+      plot(ratingsByCacaoPerc$Cocoa_Percent, ratingsByCacaoPerc$Rating, xlab = 'Cocoa Percentage', ylab = 'Average Rating', main = 'Average Rating per Cocoa Percentage')
+      correlation <- cor(ratingsByCacaoPerc$Cocoa_Percent, ratingsByCacaoPerc$Rating)
+      cat("\nThe correlation of the Scatter Plot: ", correlation)
+      
+ratingsByCacaoPercent <- aggregate(Rating ~ Cocoa_Percent, data = choco, mean)
+
+ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent)) + geom_histogram(bins = 12, color = "black", fill = "gray")+ geom_vline(aes(xintercept=median(Cocoa_Percent)), color="blue", linetype="dashed") +scale_x_continuous(breaks = scales::pretty_breaks(n = 12)) 
+
+ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating))+geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4, color='blue') + labs(title="Ratings")
+
+ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating)) +
+  geom_point() + 
+  geom_smooth(method=lm, se=FALSE, fullrange=TRUE)+
+  theme_classic()
+
+```
+4. How do different characteristics of the chocolate compare? To elaborate, which characteristics tend to be more favorable and which ones are not? Create both numerical and graphical summaries, and explain.
+```{r}
+
+```
 
 
 
