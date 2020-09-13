@@ -1,6 +1,6 @@
 ---
 title: "Team"
-author: "Patrick Wenzel"
+author: "Patrick Wenzel & Kordell Schrock"
 date: "9/11/2020"
 output: html_document
 ---
@@ -15,6 +15,7 @@ library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(devtools)
+library(data.table)
 
 choco <- read.csv("https://raw.githubusercontent.com/xdaiISU/ds202materials/master/hwlabs/data/choco.csv") 
 str(choco) 
@@ -26,7 +27,7 @@ ggplot(choco, aes(x=Rating)) + geom_histogram(binwidth=.25,color = "black", fill
 ggplot(choco, aes(x="Rating", y=Rating))+geom_boxplot(outlier.colour="red", outlier.shape=8, outlier.size=4, color='blue') + labs(title="Ratings")
 ```
 
-    What this historgram is showing is the distribution of ratings for chocolates. From what it looks like, the majority of rating are between ~2.6 - ~3.7. It looks like there could be some outliers at 1.0, 1.5, ~1.6, and ~1.8. This boxplot is showing that the lower quartile of the ratings is 3.0 and that the upper quartile is 3.5. We also know from this box plot that the median of this dataset is around 3.25. Confirming the outliers I suspected above, the boxplot shows outliers at 1.0, 1.5, ~1.6, and 1.9. 
+    1.Answer: We can see that the data there are 4 outliers in the data from the Boxplot. The binWidth is set to .25 we can see that the data is a little bit skewed in the Histogram. What this historgram is showing is the distribution of ratings for chocolates. From what it looks like, the majority of rating are between ~2.6 - ~3.7. It looks like there could be some outliers at 1.0, 1.5, ~1.6, and ~1.8. This boxplot is showing that the lower quartile of the ratings is 3.0 and that the upper quartile is 3.5. We also know from this box plot that the median of this dataset is around 3.25. Confirming the outliers I suspected above, the boxplot shows outliers at 1.0, 1.5, ~1.6, and 1.9. 
 
 2. How does the number of ratings depend on the year? Draw a bar chart of the number of reports.
 ```{r}
@@ -34,7 +35,7 @@ ratingsByYear <- aggregate(Rating ~ Date, data = choco, FUN = function(x){NROW(x
       barplot(ratingsByYear$Rating, ratingsByYear$Date, xlab = 'Year of Ratings', ylab = 'Number of Ratings that Year', main = 'Number of Ratings per Year', names.arg = ratingsByYear$Date, cex.names = 0.7)
 ```
 
-    As you can see in this bar graph, typically, as the years get larger, the more reviews there are with the max being in 2015. There was a decline after 2015 and now there seem to be ~200 reviews/year.
+    2.Answer: As you can see in this bar graph, typically, as the years get larger, the more reviews there are with the max being in 2015. There was a decline after 2015 and now there seem to be ~200 reviews/year.
 
 3. 
 ```{r}
@@ -55,17 +56,56 @@ ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating)) +
   geom_smooth(method=lm, se=FALSE, fullrange=TRUE)+
   theme_classic()
 ```
-
+    
+     3.Answer: We would say the Cocoa Percent does not matter that much because if you look at the histogram it is evenly distributed. In addition, the scatter plot with a line of best fit. Since the Correlatin of the Variables Cocoa Percent and Ratings is -.17, this means that they are not correlated since the number is close to 0.
+     
 4. How do different characteristics of the chocolate compare? To elaborate, which characteristics tend to be more favorable and which ones are not? Create both numerical and graphical summaries, and explain.
 
     ```{r}
       ratingsByCharacteristic <- aggregate(Rating ~ Characteristics1, data = choco, mean)
       ratingsByCharacteristicSorted <- ratingsByCharacteristic[order(ratingsByCharacteristic$Rating), ]
-      ratingsByCharacteristicSorted
+      # ratingsByCharacteristicSorted
       barplot(ratingsByCharacteristicSorted$Rating, xlab = 'Primary Characteristic', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Primary Characteristic', las = 2, names.arg = ratingsByCharacteristicSorted$Characteristics1, cex.names = 0.4)
+      
+ratingsByCharacteristic1 <-  data.frame(aggregate(Rating ~ Characteristics1, data = choco, mean))
+ratingsByCharacteristic2 <-  data.frame(aggregate(Rating ~ Characteristics2, data = choco, mean))
+ratingsByCharacteristic3 <-  data.frame(aggregate(Rating ~ Characteristics3, data = choco, mean))
+ratingsByCharacteristic4 <-  data.frame(aggregate(Rating ~ Characteristics4, data = choco, mean))
+
+names(ratingsByCharacteristic1)[1] <- "characteristics"
+names(ratingsByCharacteristic2)[1] <- "characteristics"
+names(ratingsByCharacteristic3)[1] <- "characteristics"
+names(ratingsByCharacteristic4)[1] <- "characteristics"
+
+
+DF <- do.call(rbind, list(ratingsByCharacteristic1,ratingsByCharacteristic2,ratingsByCharacteristic3,ratingsByCharacteristic4))
+DT <- data.table(DF)
+
+averages <- aggregate( Rating ~ characteristics, DT, mean )
+averagesSorted <- averages[order(-averages$Rating), ]
+top30Characteristics <- averagesSorted[1:30,]
+print(top30Characteristics)
+
+
+top5Characteristics <- averagesSorted[1:5,]
+
+ggplot(data=top5Characteristics, aes(x=characteristics, y=Rating)) +
+  geom_bar(stat="identity", fill="steelblue",)+
+  geom_text(aes(label=Rating), vjust=1.6, color="white", size=3.5)+ labs(title="Top 5 Rated Characteristics")
+
+averagesSortedWorst <- averages[order(averages$Rating), ]
+worst30Characteristics <- averagesSortedWorst[1:30,]
+print(worst30Characteristics)
+worst5Characteristics <- averagesSortedWorst[1:5,]
+
+ggplot(data=worst5Characteristics, aes(x=characteristics, y=Rating)) +
+  geom_bar(stat="identity", fill="steelblue",)+
+  geom_text(aes(label=Rating), vjust=1.6, color="white", size=3.5)+ labs(title="Worst 5 Rated Characteristics")
     ```
     
-    From the left, you can see that malitol, over roasted, charred, and leather are some of the least favorable primary characteristics. On the other hand, Sweet spice, distinct lemon, tropical fruit, and strong cocoa are the most favored primary characteristics. Looking at the numerical data above the chart, you get a better look into which primary characteristics are prefered/not preferred since the graph cannot display all of the names.
+    4.Answer: From the left, you can see that malitol, over roasted, charred, and leather are some of the least favorable primary characteristics. On the other hand, Sweet spice, distinct lemon, tropical fruit, and strong cocoa are the most favored primary characteristics. Looking at the numerical data above the chart (First Chart), you get a better look into which primary characteristics are prefered/not preferred since the graph cannot display all of the names. 
+    
+    Looking at the data there are ~30 Characteristics that are rated 4. The way this was found  was combining all 4 Characteristics into 1 column and combine their scores and finding the mean for each Characteristic. Looking through the data we can see that people have different Characteristics they look for in chocolate. Some Characteristics are better than others. 
 
 5. I would like to find out which countries produce the best bars and I would like to find out what company produces the best chocolate bars
 
@@ -74,18 +114,32 @@ ggplot(ratingsByCacaoPercent, aes(x=Cocoa_Percent, y=Rating)) +
       ratingsByCountry <- aggregate(Rating ~ Location, data = choco, mean)
       ratingsByCountry
       barplot(ratingsByCountry$Rating, xlab = 'Country', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Country', las = 2, names.arg = ratingsByCountry$Location, cex.names = 0.4)
-    ```
-
-    Although hard to see, easier if you drag the image into a new tab, the average rating of chocolate bars per country is pretty consistent. There are a some dips like Ghana, Gernada, India, Ireland, Malaysia, Martinique, Portugal, Puerto Rico, Singapore, St. Lucia, St. Vincent-Grenadines, Vanuatu, and Wales. Other than these countries the average rating of countries is above 3.0 (~81% !).
-
-    ```{r}
-      ratingsByCompany <- aggregate(Rating ~ Company, data = choco, mean)
+      
+       ratingsByCompany <- aggregate(Rating ~ Company, data = choco, mean)
       ratingsByCompany
       barplot(ratingsByCompany$Rating, xlab = 'Company', ylab = 'Chocolate Bar Average Rating', main = 'Average Chocolate Bar Rating Based off of Company', las = 2, names.arg = ratingsByCompany$Company, cex.names = 0.4)
       hist(ratingsByCompany$Rating)
+      
+      # Find the top 5 rated companies 
+companies <-  data.frame(aggregate(Rating ~ Company, data = choco, mean))
+companiesSorted <- companies[order(-companies$Rating), ]
+top5Companies <- companiesSorted[1:5,]
+# Find the worst 5 rated companies 
+companiesSortedWorse <- companies[order(companies$Rating), ]
+worst5Companies <- companiesSortedWorse[1:5,]
+ggplot(data=top5Companies, aes(x=Company, y=Rating)) +
+  geom_bar(stat="identity", fill="steelblue",)+
+  geom_text(aes(label=Rating), vjust=1.6, color="white", size=3.5)+ labs(title="Top 5 Rated Companies To Buy From")
+
+ggplot(data=worst5Companies, aes(x=Company, y=Rating)) +
+  geom_bar(stat="identity", fill="steelblue",)+
+  geom_text(aes(label=Rating), vjust=1.6, color="white", size=3.5)+ labs(title="Worst 5 Rated Companies Not To Buy From")
     ```
 
-    Although there a lot of companies and it is not easy to see individual companies in the barchart, it obvious that there is a wide range of ratings. The histogram also confirms this with spikes from ~2.5 - ~3.75.
+     5.Answer: Although hard to see, easier if you drag the image into a new tab, the average rating of chocolate bars per country is pretty consistent. There are a some dips like Ghana, Gernada, India, Ireland, Malaysia, Martinique, Portugal, Puerto Rico, Singapore, St. Lucia, St. Vincent-Grenadines, Vanuatu, and Wales. Other than these countries the average rating of countries is above 3.0 (~81% !).
+    
+    Although there a lot of companies and it is not easy to see individual companies in the barchart (First Chart), it obvious that there is a wide range of ratings. The histogram also confirms this with spikes from ~2.5 - ~3.75.
+    Here we wanted to look at the top 5 rated companies (Second Chart). Also, the top worst companies and list then (Third Chart). This would help show people which companies are best to buy from for chocolate.
 
 
 
